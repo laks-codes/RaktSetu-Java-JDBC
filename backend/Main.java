@@ -7,9 +7,9 @@ public class Main {
         String configuredPort = System.getenv("SERVER_PORT");
         if (configuredPort != null && !configuredPort.isEmpty()) port = Integer.parseInt(configuredPort);
         Database database = new Database();
-        AuthService authService = new AuthService(new JdbcUserDao(database));
+        AuthService authService = new AuthService(database);
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-        server.createContext("/api/v1", new ApiRouter(database, authService));
+        server.createContext("/api/v1", new ApiController(database, authService));
         server.setExecutor(null);
         server.start();
         System.out.println("RaktSetu Java API listening on port " + port);

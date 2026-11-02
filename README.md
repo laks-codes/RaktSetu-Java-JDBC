@@ -1,112 +1,85 @@
-# RaktSetu — Emergency Blood Donor Search and Request System
-[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://www.oracle.com/java/)
-[![Backend](https://img.shields.io/badge/Backend-Java%20%2B%20JDBC-orange.svg)](https://docs.oracle.com/en/java/)
-[![React](https://img.shields.io/badge/React-18-blue.svg)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.x-38B2AC.svg)](https://tailwindcss.com/)
+# RaktSetu
 
-> [!IMPORTANT]
-> **Educational Project Disclaimer**:  
-> RaktSetu is an educational software engineering project built to demonstrate full-stack architecture, clean code principles, and emergency resource coordination. **It does not claim to medically certify donor compatibility, donor eligibility, infectious disease status, or transfusion suitability.** Clinical screening and compatibility matching must always be performed by licensed medical professionals and certified blood transfusion centers.
+RaktSetu is a small blood donor search and blood request app. A user can create a donor or requester account, sign in, search donors by blood group and city, or submit a blood request.
 
----
+## Project layout
 
-## Overview
-**RaktSetu** connects voluntary blood donors with individuals and hospitals facing blood emergencies. The system supports full request lifecycles, donor discovery by blood group and city, donor responses, role-based dashboards, and audit-logged administrative monitoring.
-
----
-
-## Technology Stack
-
-- **Frontend**: React 18, Vite, TypeScript, Tailwind CSS, React Router v6, Lucide React icons.
-- **Backend**: Java 21, built-in `HttpServer`, JDBC, Gson, and MySQL Connector/J.
-- **Storage**: MySQL database configured through environment variables.
-
----
-
-## Project Structure
-```
+```text
 RaktSetu/
-├── frontend/               # React + TypeScript + Vite application
-├── backend/                # Flat Java source files, Maven config, and schema.sql
-├── README.md
-├── CONTRIBUTING.md
-├── api-contract.md
-├── architecture.md
-├── database-integration.md
-├── java-jdbc-migration-plan.md
-├── testing-report.md
-└── .gitignore
+├── frontend/                 React website
+└── backend/                  Java files, MySQL schema and Maven file
+    ├── Main.java
+    ├── ApiController.java
+    ├── AuthService.java
+    ├── BloodService.java
+    ├── Database.java
+    ├── User.java
+    └── schema.sql
 ```
 
----
+The backend uses Java's built-in HTTP server, JDBC, MySQL, Gson for JSON, and BCrypt for password hashing. Its Java source files are kept directly in `backend/` for a beginner-friendly layout.
 
-## Quickstart Guide
+## Requirements
 
-### Prerequisites
-- **Java 21 JDK** installed (`java -version`)
-- **MySQL 8**
-- **Node.js** (v18+ or v20+) and **npm** (`node -v`, `npm -v`)
-- Apache Maven 3.8+
+- JDK 21 or later
+- Maven 3.8 or later
+- MySQL 8 or later
+- Node.js 18 or later and npm
 
----
+## Configure and run the backend
 
-### 1. Running the Backend
+1. Create the five-table database from the supplied ER diagram:
 
-1. Open a terminal and navigate to `backend/`:
-   ```bash
+   ```sh
    cd backend
-   ```
-2. Create the database from the project schema:
-   ```bash
    mysql -u root -p < schema.sql
    ```
-3. Set MySQL connection values from `backend/.env.example` in your shell or deployment environment. The app reads environment variables directly.
-4. Build and start:
-   ```bash
+
+2. Set these environment values in the terminal or hosting environment. The program does not read a `.env` file automatically.
+
+   ```sh
+   export MYSQL_HOST=localhost
+   export MYSQL_PORT=3306
+   export MYSQL_DATABASE=raktsetu_db
+   export MYSQL_USER=raktsetu_user
+   export MYSQL_PASSWORD=your_mysql_password
+   export JWT_SECRET=use_a_private_random_value_at_least_32_characters_long
+   export SERVER_PORT=8080
+   ```
+
+3. Build and start the server:
+
+   ```sh
    mvn clean package
    mvn exec:java
    ```
-5. The REST API will be available at:
-   - Base URL: `http://localhost:8080/api/v1`
 
----
+The API listens at `http://localhost:8080/api/v1`.
 
-### 2. Running the Frontend (React + Vite)
+## Configure and run the frontend
 
-1. Open a second terminal and navigate to `frontend/`:
-   ```bash
-   cd frontend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Copy environment configuration:
-   ```bash
-   cp .env.example .env
-   ```
-   *(Set `VITE_API_BASE_URL=http://localhost:8080`; the frontend appends `/api/v1`.)*
-4. Start the Vite development server:
-   ```bash
-   npm run dev
-   ```
-5. Open your browser at `http://localhost:5173`.
+In a second terminal:
 
----
+```sh
+cd frontend
+npm install
+```
 
-## Key Features & Business Rules
-- **Privacy First**: Sensitive contact information (phone number, email, address) is masked on public donor searches unless explicit consent is recorded.
-- **Request Lifecycle**: Strict transition rules (`OPEN` -> `IN_PROGRESS` -> `FULFILLED` / `CANCELLED`).
-- **Duplicate Prevention**: Donors cannot submit multiple responses to the same request.
-- **Tamper-Evident Admin Audit**: Administrative suspensions and request closures are written to an immutable audit trail.
-- **API Compatibility**: The frontend continues to call the same `/api/v1` endpoints and expects Bearer JWT authentication.
+Set `VITE_API_BASE_URL=http://localhost:8080` in `frontend/.env`, then start Vite:
 
----
+```sh
+npm run dev
+```
 
-## Documentation Links
-- [System Architecture](architecture.md)
-- [REST API Contract](api-contract.md)
-- [Database Setup and Schema](database-integration.md)
-- [Migration Notes](java-jdbc-migration-plan.md)
-- [Verification Report](testing-report.md)
+Open the local URL printed by Vite (usually `http://localhost:5173`).
+
+## Active features
+
+- Donor or requester registration and login
+- Donor search by blood group and city
+- Contact details shown only when a donor opted in to sharing them
+- Blood request submission
+
+The database keeps all five ER entities and relationships: `users`, `donor_profiles`, `blood_requests`, `donor_responses`, and `audit_logs`. Donor responses and admin/audit screens are not part of this simplified app flow.
+
+See [backend/README.md](backend/README.md), [api-contract.md](api-contract.md), and [database-integration.md](database-integration.md) for details.

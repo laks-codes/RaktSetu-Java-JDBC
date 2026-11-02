@@ -1,11 +1,10 @@
 import React from 'react';
-import { RequestStatus, UrgencyLevel } from '../../types';
+import { UrgencyLevel } from '../../types';
 
 export interface BadgeProps {
   children: React.ReactNode;
   variant?: 'blood' | 'urgency' | 'status' | 'neutral' | 'success' | 'warning';
   urgency?: UrgencyLevel;
-  status?: RequestStatus;
   size?: 'sm' | 'md';
   className?: string;
 }
@@ -14,7 +13,6 @@ export const Badge: React.FC<BadgeProps> = ({
   children,
   variant = 'neutral',
   urgency,
-  status,
   size = 'md',
   className = '',
 }) => {
@@ -34,16 +32,6 @@ export const Badge: React.FC<BadgeProps> = ({
       colorClasses = 'bg-amber-100 text-amber-800 border-amber-300';
     } else {
       colorClasses = 'bg-blue-50 text-blue-800 border-blue-200';
-    }
-  } else if (variant === 'status' && status) {
-    if (status === 'OPEN') {
-      colorClasses = 'bg-emerald-50 text-emerald-800 border-emerald-200';
-    } else if (status === 'IN_PROGRESS') {
-      colorClasses = 'bg-amber-50 text-amber-800 border-amber-200';
-    } else if (status === 'FULFILLED') {
-      colorClasses = 'bg-blue-50 text-blue-800 border-blue-200';
-    } else {
-      colorClasses = 'bg-slate-100 text-slate-600 border-slate-200';
     }
   } else if (variant === 'success') {
     colorClasses = 'bg-emerald-50 text-emerald-800 border-emerald-200';

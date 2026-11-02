@@ -20,6 +20,7 @@ export const RegisterPage: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [city, setCity] = useState('');
   const [bloodGroup, setBloodGroup] = useState<BloodGroup>('O+');
+  const [consentToContact, setConsentToContact] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -37,13 +38,9 @@ export const RegisterPage: React.FC = () => {
         city,
         role,
         bloodGroup: role === 'ROLE_DONOR' ? bloodGroup : undefined,
+        consentToContact: role === 'ROLE_DONOR' ? consentToContact : undefined,
       });
-
-      if (role === 'ROLE_DONOR') {
-        navigate('/dashboard/donor');
-      } else {
-        navigate('/dashboard/requester');
-      }
+      navigate('/');
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
@@ -180,6 +177,18 @@ export const RegisterPage: React.FC = () => {
                 <div />
               )}
             </div>
+
+            {role === 'ROLE_DONOR' && (
+              <label className="flex items-start gap-2 text-sm text-slate-600">
+                <input
+                  type="checkbox"
+                  checked={consentToContact}
+                  onChange={(e) => setConsentToContact(e.target.checked)}
+                  className="mt-1 rounded border-slate-300 text-crimson-600 focus:ring-crimson-500"
+                />
+                <span>Let signed-in users see my phone number and email in donor search.</span>
+              </label>
+            )}
 
             <Input
               label="Password"

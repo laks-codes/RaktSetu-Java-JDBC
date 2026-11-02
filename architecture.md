@@ -1,33 +1,22 @@
-# RaktSetu Architecture
+# Simple project structure
 
-## System overview
+The website is in `frontend/`. The backend is in `backend/` with six Java source files at its root:
 
-RaktSetu is split into a React/Vite frontend and a plain Java backend. The frontend uses the `/api/v1` REST contract and sends JSON with a Bearer token when logged in.
+```text
+Main.java          starts the built-in Java HTTP server
+ApiController.java reads HTTP requests and returns JSON
+AuthService.java   checks passwords and creates bearer tokens
+BloodService.java  searches donors and saves requests
+Database.java      connects to MySQL and reads/writes users
+User.java          stores account details
+```
 
-## Backend
+`ApiController` has the active routes for registration, login, current user, donor search, and creating a blood request. `AuthService` handles login-related work; `BloodService` handles donor search and request storage; `Database` contains user JDBC operations. SQL values use `PreparedStatement`.
 
-All Java files are directly inside `backend/`, so there are no nested source folders.
+## Database and ER diagram
 
-- `Main.java` starts Java's built-in HTTP server.
-- `ApiRouter.java` sends each URL to the matching feature controller.
-- `AuthController.java`, `DonorController.java`, `RequestController.java`, `ResponseController.java`, and `AdminController.java` handle their own API features.
-- `ApiController.java` handles shared HTTP request and response behavior; `ApiSupport.java` contains common JSON, JDBC, and validation helpers.
-- `AuthService.java` handles password hashing and signed token operations.
-- `UserDao.java` and `JdbcUserDao.java` handle user persistence with JDBC.
-- `Database.java` reads MySQL settings from environment variables.
-- `User.java` holds user data with private fields and getters/setters.
-- Gson handles request and response JSON; MySQL Connector/J provides JDBC connectivity.
+`backend/schema.sql` retains the five ER entities and relationships: `users`, `donor_profiles`, `blood_requests`, `donor_responses`, and `audit_logs`. A user may have a donor profile and create requests; requests may have donor responses; audit records refer to users. The simplified frontend/backend actively use accounts, donor profiles, and blood requests. The other two tables remain in the schema for ER-diagram consistency.
 
-All SQL values are bound through `PreparedStatement`. The schema uses `users`, `donor_profiles`, `blood_requests`, `donor_responses`, and `audit_logs`.
+## Active website flow
 
-## API contract
-
-The frontend services and `api-contract.md` define the URL paths, methods, request fields, and response shapes. The backend keeps the `/api/v1` prefix and applies bearer authentication, user roles, ownership checks, donor availability, request status transitions, duplicate response constraints, and administrator audit records.
-
-## Database source
-
-The supplied ER diagram has the same five entities and relationships as `backend/schema.sql`: users have zero or one donor profile; users create many requests; each request receives many responses; and administrators create audit records. The physical schema includes additional fields needed by the documented API contract. The handwritten diagram image is not included in the repository because names and IDs are visible in the photo.
-
-## Educational project disclaimer
-
-RaktSetu does not certify donor compatibility, eligibility, infection status, or transfusion suitability. Licensed medical professionals and blood banks must handle clinical screening and compatibility decisions.
+Registration/login provides a bearer token. Donor search and blood request submission require that token. Donors choose whether their contact information is shared in search results. No admin dashboard, audit screen, donor response, or request management screen is included in this simple flow.

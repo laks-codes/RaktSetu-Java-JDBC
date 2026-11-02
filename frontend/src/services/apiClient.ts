@@ -1,6 +1,6 @@
 import { ErrorResponse } from '../types';
 
-const rawBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://raktsetu-wyhc.onrender.com';
+const rawBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 const normalizeApiBaseUrl = (url: string): string => {
   let clean = url.trim().replace(/\/+$/, '');
@@ -94,16 +94,6 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     throw new ApiError(0, 'Unable to connect to RaktSetu backend. Please ensure the server is running.');
   }
 }
-
-let hasWarmedUp = false;
-export const warmUpBackend = (): void => {
-  if (hasWarmedUp) return;
-  hasWarmedUp = true;
-  // Non-blocking ping to wake up the backend if asleep on free-tier hosting
-  fetch(`${API_BASE_URL}/donors?page=0&size=1`, { method: 'GET' }).catch(() => {
-    // Silent catch for background pre-warming
-  });
-};
 
 export const apiClient = {
   get: <T>(endpoint: string, options?: RequestInit) => request<T>(endpoint, { method: 'GET', ...options }),

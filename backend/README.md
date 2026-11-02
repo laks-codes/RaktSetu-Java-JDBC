@@ -1,32 +1,29 @@
-# RaktSetu Java + JDBC backend
+# Backend setup
 
-This backend uses Java 21, the built-in `HttpServer`, Gson for JSON, JDBC, MySQL Connector/J, and BCrypt. All Java files sit directly in this `backend/` folder. The folders are kept flat.
+This backend is kept in one folder with six Java files:
 
-## Java files
+- `Main.java`: starts the HTTP server.
+- `ApiController.java`: handles HTTP routes and JSON.
+- `AuthService.java`: handles passwords and login tokens.
+- `BloodService.java`: searches donors and saves blood requests.
+- `Database.java`: opens MySQL connections and reads/writes user accounts.
+- `User.java`: stores user account data.
 
-- `Main.java` starts the server.
-- `ApiRouter.java` selects the right feature controller.
-- `AuthController.java`, `DonorController.java`, `RequestController.java`, `ResponseController.java`, and `AdminController.java` each handle one part of the app.
-- `ApiController.java` handles shared HTTP behavior, and `ApiSupport.java` contains shared JSON and database helpers.
-- `Database.java`, `UserDao.java`, `JdbcUserDao.java`, `AuthService.java`, and `User.java` handle database setup, user data, and login.
+The required diagram schema is in `schema.sql`. It creates `users`, `donor_profiles`, `blood_requests`, `donor_responses`, and `audit_logs`, with the foreign keys shown by the ER diagram. Only accounts, donor search, and blood request operations are currently active in the simplified application.
 
 ## Requirements
 
-- Java 21
-- Maven 3.8+
-- MySQL 8+
+JDK 21+, Maven 3.8+, and MySQL 8+.
 
-## Database setup
+## MySQL
 
-Create a MySQL account with permission to create/use the `raktsetu_db` database, then apply the schema:
+Create the database and tables:
 
 ```sh
 mysql -u root -p < schema.sql
 ```
 
-The schema follows the five entities and relationships in the supplied ER diagram. The photo is not stored in the repository because it shows handwritten names and IDs. See `../database-integration.md` for the SQL fields and constraints.
-
-Set the environment values shown in `.env.example`. `JWT_SECRET` must be a private random value of at least 32 characters. The application reads environment variables directly; it does not parse `.env` files.
+Set `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_DATABASE`, `MYSQL_USER`, and `MYSQL_PASSWORD` before running. Defaults are in `.env.example`; copy the values into your shell or deployment configuration because the app does not load `.env` files. Set `JWT_SECRET` to a private random string of at least 32 characters.
 
 ## Build and run
 
@@ -35,12 +32,6 @@ mvn clean package
 mvn exec:java
 ```
 
-The API listens on `http://localhost:8080/api/v1`. Point the unchanged frontend at it by setting `VITE_API_BASE_URL=http://localhost:8080` in the frontend environment. The frontend appends `/api/v1` itself.
+The API base is `http://localhost:8080/api/v1`. `SERVER_PORT` can change the port. The frontend setting `VITE_API_BASE_URL` should contain the server origin, for example `http://localhost:8080`.
 
-## Notes
-
-- All database queries use `PreparedStatement`.
-- Passwords use BCrypt (cost 10), matching the previous backend; bearer tokens are signed with HMAC-SHA256.
-- The endpoint paths and JSON fields are intended to match `../api-contract.md` and the frontend service calls.
-- Create a donor profile after registering as a donor if registration did not include a blood group.
-- Demo account credentials are not inserted by this schema because the old mock credentials do not have password hashes compatible with the Java password implementation.
+SQL values are supplied with JDBC `PreparedStatement`s. Gson handles JSON and BCrypt hashes passwords.

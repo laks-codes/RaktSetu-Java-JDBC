@@ -5,7 +5,7 @@ import { Card } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
 import { Alert } from '../../components/common/Alert';
-import { HeartHandshake, LogIn, Sparkles } from 'lucide-react';
+import { HeartHandshake, LogIn } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const { login } = useAuth();
@@ -30,7 +30,7 @@ export const LoginPage: React.FC = () => {
         navigate(from, { replace: true });
       } else {
         // Navigate based on default dashboard
-        navigate('/donors');
+        navigate('/');
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -41,11 +41,6 @@ export const LoginPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleQuickDemo = (demoEmail: string, demoPass: string) => {
-    setEmail(demoEmail);
-    setPassword(demoPass);
   };
 
   return (
@@ -59,7 +54,7 @@ export const LoginPage: React.FC = () => {
             Welcome to RaktSetu
           </h2>
           <p className="text-xs sm:text-sm text-slate-500">
-            Sign in to manage your blood requests or donor availability
+            Sign in to request blood or find an available donor
           </p>
         </div>
 
@@ -95,36 +90,6 @@ export const LoginPage: React.FC = () => {
             </Button>
           </form>
 
-          {/* Quick Demo Credentials for Reviewers */}
-          <div className="mt-6 pt-6 border-t border-slate-100">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              <span>Quick Demo Accounts</span>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('requester@raktsetu.org', 'Requester@123')}
-                className="px-2 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors text-center"
-              >
-                Requester
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('donor@raktsetu.org', 'Donor@123')}
-                className="px-2 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors text-center"
-              >
-                Donor (O+)
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('admin@raktsetu.org', 'Admin@123')}
-                className="px-2 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors text-center"
-              >
-                Admin
-              </button>
-            </div>
-          </div>
         </Card>
 
         <p className="text-center text-xs text-slate-500">

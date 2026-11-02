@@ -9,6 +9,7 @@ export interface RegisterPayload {
   city: string;
   role?: Role;
   bloodGroup?: BloodGroup;
+  consentToContact?: boolean;
 }
 
 export interface LoginPayload {

@@ -1,16 +1,11 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './hooks/useAuth';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { AppRoutes } from './routes/AppRoutes';
-import { warmUpBackend } from './services/apiClient';
 
 export const App: React.FC = () => {
-  useEffect(() => {
-    warmUpBackend();
-  }, []);
-
   return (
     <BrowserRouter>
       <AuthProvider>
