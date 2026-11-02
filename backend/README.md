@@ -1,6 +1,14 @@
 # RaktSetu Java + JDBC backend
 
-This backend uses Java 21, the built-in `HttpServer`, Gson for JSON, JDBC, MySQL Connector/J, and BCrypt. All Java source files sit directly in this `backend/` folder. There are no Java packages or nested source folders.
+This backend uses Java 21, the built-in `HttpServer`, Gson for JSON, JDBC, MySQL Connector/J, and BCrypt. All Java files sit directly in this `backend/` folder. The folders are kept flat.
+
+## Java files
+
+- `Main.java` starts the server.
+- `ApiRouter.java` selects the right feature controller.
+- `AuthController.java`, `DonorController.java`, `RequestController.java`, `ResponseController.java`, and `AdminController.java` each handle one part of the app.
+- `ApiController.java` handles shared HTTP behavior, and `ApiSupport.java` contains shared JSON and database helpers.
+- `Database.java`, `UserDao.java`, `JdbcUserDao.java`, `AuthService.java`, and `User.java` handle database setup, user data, and login.
 
 ## Requirements
 

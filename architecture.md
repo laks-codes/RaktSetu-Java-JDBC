@@ -6,8 +6,12 @@ RaktSetu is split into a React/Vite frontend and a plain Java backend. The front
 
 ## Backend
 
-- `Main.java` starts Java's built-in `HttpServer` and registers the `/api/v1` handler.
-- `ApiController.java` maps HTTP methods and paths, validates access, and encodes API responses.
+All Java files are directly inside `backend/`, so there are no nested source folders.
+
+- `Main.java` starts Java's built-in HTTP server.
+- `ApiRouter.java` sends each URL to the matching feature controller.
+- `AuthController.java`, `DonorController.java`, `RequestController.java`, `ResponseController.java`, and `AdminController.java` handle their own API features.
+- `ApiController.java` handles shared HTTP request and response behavior; `ApiSupport.java` contains common JSON, JDBC, and validation helpers.
 - `AuthService.java` handles password hashing and signed token operations.
 - `UserDao.java` and `JdbcUserDao.java` handle user persistence with JDBC.
 - `Database.java` reads MySQL settings from environment variables.
