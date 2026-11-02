@@ -27,17 +27,16 @@
 ## Project Structure
 ```
 RaktSetu/
-├── frontend/               # React + TypeScript + Vite + Tailwind CSS SPA
-├── backend/                # Java 21 + JDBC REST API
-├── docs/
-│   ├── architecture.md     # High-level system architecture & diagrams
-│   ├── api-contract.md     # Complete REST API specifications & payloads
-│   ├── database-integration.md # Proposed MySQL schema & integration contract
-│   ├── java-jdbc-migration-plan.md # Backend migration record and API checklist
-│   └── testing-report.md   # QA test execution results & verification audit
-├── CONTRIBUTING.md         # Contribution guidelines and standards
-├── README.md               # Quickstart and project guide
-└── .gitignore              # Repository exclusions
+├── frontend/               # React + TypeScript + Vite application
+├── backend/                # Flat Java source files, Maven config, and schema.sql
+├── README.md
+├── CONTRIBUTING.md
+├── api-contract.md
+├── architecture.md
+├── database-integration.md
+├── java-jdbc-migration-plan.md
+├── testing-report.md
+└── .gitignore
 ```
 
 ---
@@ -60,7 +59,7 @@ RaktSetu/
    ```
 2. Create the database from the project schema:
    ```bash
-   mysql -u root -p < src/main/resources/schema.sql
+   mysql -u root -p < schema.sql
    ```
 3. Set MySQL connection values from `backend/.env.example` in your shell or deployment environment. The app reads environment variables directly.
 4. Build and start:
@@ -106,7 +105,8 @@ RaktSetu/
 ---
 
 ## Documentation Links
-- [System Architecture](file:///docs/architecture.md)
-- [REST API Contract](file:///docs/api-contract.md)
-- [Database Integration Specification](file:///docs/database-integration.md)
-- [QA Testing Report](file:///docs/testing-report.md)
+- [System Architecture](architecture.md)
+- [REST API Contract](api-contract.md)
+- [Database Setup and Schema](database-integration.md)
+- [Migration Notes](java-jdbc-migration-plan.md)
+- [Verification Report](testing-report.md)

@@ -1,6 +1,3 @@
-package com.raktsetu.dao;
-
-import com.raktsetu.model.User;
 import java.sql.SQLException;
 
 /** Defines user persistence operations independently of the database implementation. */

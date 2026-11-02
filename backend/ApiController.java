@@ -1,10 +1,5 @@
-package com.raktsetu.controller;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.raktsetu.config.Database;
-import com.raktsetu.model.User;
-import com.raktsetu.service.AuthService;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;

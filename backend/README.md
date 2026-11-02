@@ -1,6 +1,6 @@
 # RaktSetu Java + JDBC backend
 
-This backend uses Java 21, the built-in `HttpServer`, Gson for JSON, JDBC, and MySQL Connector/J. It does not use Spring, JPA, Hibernate, streams, or lambdas.
+This backend uses Java 21, the built-in `HttpServer`, Gson for JSON, JDBC, MySQL Connector/J, and BCrypt. All Java source files sit directly in this `backend/` folder. There are no Java packages or nested source folders.
 
 ## Requirements
 
@@ -13,10 +13,10 @@ This backend uses Java 21, the built-in `HttpServer`, Gson for JSON, JDBC, and M
 Create a MySQL account with permission to create/use the `raktsetu_db` database, then apply the schema:
 
 ```sh
-mysql -u root -p < src/main/resources/schema.sql
+mysql -u root -p < schema.sql
 ```
 
-The schema follows the five entity tables and constraints described in `../docs/database-integration.md`. The ZIP did not include the referenced ER diagram image; see `../docs/java-jdbc-migration-plan.md`.
+The schema follows the five entities and relationships in the supplied ER diagram. The photo is not stored in the repository because it shows handwritten names and IDs. See `../database-integration.md` for the SQL fields and constraints.
 
 Set the environment values shown in `.env.example`. `JWT_SECRET` must be a private random value of at least 32 characters. The application reads environment variables directly; it does not parse `.env` files.
 
@@ -33,6 +33,6 @@ The API listens on `http://localhost:8080/api/v1`. Point the unchanged frontend 
 
 - All database queries use `PreparedStatement`.
 - Passwords use BCrypt (cost 10), matching the previous backend; bearer tokens are signed with HMAC-SHA256.
-- The endpoint paths and JSON fields are intended to match `../docs/api-contract.md` and the frontend service calls.
+- The endpoint paths and JSON fields are intended to match `../api-contract.md` and the frontend service calls.
 - Create a donor profile after registering as a donor if registration did not include a blood group.
 - Demo account credentials are not inserted by this schema because the old mock credentials do not have password hashes compatible with the Java password implementation.

@@ -1,5 +1,3 @@
-package com.raktsetu.model;
-
 /** Encapsulates an application user. */
 public class User {
     private long id;

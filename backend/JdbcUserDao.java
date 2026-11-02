@@ -1,7 +1,3 @@
-package com.raktsetu.dao;
-
-import com.raktsetu.config.Database;
-import com.raktsetu.model.User;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
