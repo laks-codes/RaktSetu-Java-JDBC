@@ -23,7 +23,13 @@ Create the database and tables:
 mysql -u root -p < schema.sql
 ```
 
-Set `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_DATABASE`, `MYSQL_USER`, and `MYSQL_PASSWORD` before running. Defaults are in `.env.example`; copy the values into your shell or deployment configuration because the app does not load `.env` files. Set `JWT_SECRET` to a private random string of at least 32 characters.
+Create the local app account and grant it access to this database:
+
+```sh
+mysql -u root -p -e "CREATE USER IF NOT EXISTS 'raktsetu_user'@'localhost' IDENTIFIED BY 'raktsetu_secret'; GRANT SELECT, INSERT, UPDATE, DELETE ON raktsetu_db.* TO 'raktsetu_user'@'localhost';"
+```
+
+Set `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_DATABASE`, `MYSQL_USER`, and `MYSQL_PASSWORD` before running. The example account uses the defaults in `.env.example`; change the password there if you change it in MySQL. Copy the values into your shell or deployment configuration because the app does not load `.env` files. Set `JWT_SECRET` to a private random string of at least 32 characters.
 
 ## Build and run
 

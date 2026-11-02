@@ -24,10 +24,10 @@ public class AuthService {
         return database.findUserById(id);
     }
 
-    public long createUser(User user, String password) throws Exception {
+    public long createUser(User user, String password, String bloodGroup, boolean shareContact) throws Exception {
         String passwordHash = org.mindrot.jbcrypt.BCrypt.hashpw(
                 password, org.mindrot.jbcrypt.BCrypt.gensalt(10));
-        return database.createUser(user, passwordHash);
+        return database.createUser(user, passwordHash, bloodGroup, shareContact);
     }
 
     public boolean passwordMatches(String password, String passwordHash) {
@@ -45,24 +45,28 @@ public class AuthService {
     }
 
     public long tokenUserId(String token) throws Exception {
-        String[] parts = token.split("\\.");
-        if (parts.length != 3) {
-            return 0;
-        }
-        byte[] expected = sign(parts[0] + "." + parts[1]);
-        byte[] actual = Base64.getUrlDecoder().decode(parts[2]);
-        if (!MessageDigest.isEqual(expected, actual)) {
-            return 0;
-        }
+        try {
+            String[] parts = token.split("\\.");
+            if (parts.length != 3) {
+                return 0;
+            }
+            byte[] expected = sign(parts[0] + "." + parts[1]);
+            byte[] actual = Base64.getUrlDecoder().decode(parts[2]);
+            if (!MessageDigest.isEqual(expected, actual)) {
+                return 0;
+            }
 
-        String payload = new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
-        java.util.regex.Matcher id = java.util.regex.Pattern.compile("\\\"sub\\\":(\\d+)").matcher(payload);
-        java.util.regex.Matcher expiry = java.util.regex.Pattern.compile("\\\"exp\\\":(\\d+)").matcher(payload);
-        if (!id.find() || !expiry.find()
-                || Long.parseLong(expiry.group(1)) < System.currentTimeMillis() / 1000) {
+            String payload = new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
+            java.util.regex.Matcher id = java.util.regex.Pattern.compile("\\\"sub\\\":(\\d+)").matcher(payload);
+            java.util.regex.Matcher expiry = java.util.regex.Pattern.compile("\\\"exp\\\":(\\d+)").matcher(payload);
+            if (!id.find() || !expiry.find()
+                    || Long.parseLong(expiry.group(1)) < System.currentTimeMillis() / 1000) {
+                return 0;
+            }
+            return Long.parseLong(id.group(1));
+        } catch (Exception e) {
             return 0;
         }
-        return Long.parseLong(id.group(1));
     }
 
     private String encode(String text) {

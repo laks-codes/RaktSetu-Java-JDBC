@@ -35,7 +35,9 @@ The backend uses Java's built-in HTTP server, JDBC, MySQL, Gson for JSON, and BC
    mysql -u root -p < schema.sql
    ```
 
-2. Set these environment values in the terminal or hosting environment. The program does not read a `.env` file automatically.
+2. Create the local app account using the command in [backend/README.md](backend/README.md).
+
+3. Set these environment values in the terminal or hosting environment. The program does not read a `.env` file automatically.
 
    ```sh
    export MYSQL_HOST=localhost
@@ -47,7 +49,7 @@ The backend uses Java's built-in HTTP server, JDBC, MySQL, Gson for JSON, and BC
    export SERVER_PORT=8080
    ```
 
-3. Build and start the server:
+4. Build and start the server:
 
    ```sh
    mvn clean package

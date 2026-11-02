@@ -22,6 +22,11 @@ public class Database {
     }
 
     public Connection connect() throws SQLException {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new SQLException("MySQL Connector/J is missing from the backend classpath", e);
+        }
         return DriverManager.getConnection(url, username, password);
     }
 
@@ -49,26 +54,47 @@ public class Database {
         }
     }
 
-    public long createUser(User user, String passwordHash) throws SQLException {
+    public long createUser(User user, String passwordHash, String bloodGroup, boolean shareContact) throws SQLException {
         String sql = "INSERT INTO users(email,password_hash,full_name,phone_number,city,role,status) "
                 + "VALUES(?,?,?,?,?,?, 'ACTIVE')";
         try (Connection connection = connect();
              PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, user.getEmail());
-            statement.setString(2, passwordHash);
-            statement.setString(3, user.getFullName());
-            statement.setString(4, user.getPhoneNumber());
-            statement.setString(5, user.getCity());
-            statement.setString(6, user.getRole());
-            statement.executeUpdate();
+            connection.setAutoCommit(false);
+            try {
+                statement.setString(1, user.getEmail());
+                statement.setString(2, passwordHash);
+                statement.setString(3, user.getFullName());
+                statement.setString(4, user.getPhoneNumber());
+                statement.setString(5, user.getCity());
+                statement.setString(6, user.getRole());
+                statement.executeUpdate();
 
-            try (ResultSet keys = statement.getGeneratedKeys()) {
-                if (keys.next()) {
-                    return keys.getLong(1);
+                long userId;
+                try (ResultSet keys = statement.getGeneratedKeys()) {
+                    if (!keys.next()) {
+                        throw new SQLException("MySQL did not return a user id");
+                    }
+                    userId = keys.getLong(1);
                 }
+
+                if (bloodGroup != null) {
+                    String donorSql = "INSERT INTO donor_profiles(user_id,blood_group,city,consent_to_contact) "
+                            + "VALUES(?,?,?,?)";
+                    try (PreparedStatement donorStatement = connection.prepareStatement(donorSql)) {
+                        donorStatement.setLong(1, userId);
+                        donorStatement.setString(2, bloodGroup);
+                        donorStatement.setString(3, user.getCity());
+                        donorStatement.setBoolean(4, shareContact);
+                        donorStatement.executeUpdate();
+                    }
+                }
+                connection.commit();
+                return userId;
+            } catch (SQLException e) {
+                connection.rollback();
+                throw e;
             }
         }
-        throw new SQLException("MySQL did not return a user id");
     }
 
     private User readUser(ResultSet result) throws SQLException {

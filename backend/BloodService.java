@@ -118,8 +118,20 @@ public class BloodService {
     }
 
     private long longValue(Map<String, Object> values, String key) {
+        Object value = values.get(key);
+        if (value instanceof Number) {
+            double number = ((Number) value).doubleValue();
+            if (number != Math.floor(number) || number < 1 || number > Integer.MAX_VALUE) {
+                throw new IllegalArgumentException(key + " must be a whole number from 1 to 2147483647");
+            }
+            return ((Number) value).longValue();
+        }
         try {
-            return Long.parseLong(required(values, key));
+            long number = Long.parseLong(required(values, key));
+            if (number < 1 || number > Integer.MAX_VALUE) {
+                throw new IllegalArgumentException(key + " must be a whole number from 1 to 2147483647");
+            }
+            return number;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(key + " must be a number");
         }

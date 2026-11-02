@@ -1,4 +1,5 @@
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -43,8 +44,14 @@ public class ApiController implements HttpHandler {
             send(exchange, e.status, error(e.status, e.getMessage(), path));
         } catch (IllegalArgumentException e) {
             send(exchange, 400, error(400, e.getMessage(), path));
+        } catch (JsonParseException e) {
+            send(exchange, 400, error(400, "Request body must be valid JSON", path));
         } catch (java.sql.SQLIntegrityConstraintViolationException e) {
             send(exchange, 409, error(409, "A record already exists", path));
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+            send(exchange, 503, error(503,
+                    "Database operation failed. Check MySQL settings and confirm schema.sql was applied.", path));
         } catch (Exception e) {
             e.printStackTrace();
             send(exchange, 500, error(500, "Internal server error", path));
@@ -91,31 +98,12 @@ public class ApiController implements HttpHandler {
         user.setStatus("ACTIVE");
 
         String password = required(body, "password");
-        long userId = auth.createUser(user, password);
-        user.setId(userId);
-        user = auth.findById(userId);
-
-        if ("ROLE_DONOR".equals(role)) {
-            createDonorProfile(userId, user.getCity(), body);
-            user = auth.findById(userId);
-        }
-
-        return authResponse(user);
-    }
-
-    private void createDonorProfile(long userId, String city, Map<String, Object> body) throws Exception {
-        String bloodGroup = databaseBlood(required(body, "bloodGroup"));
+        String bloodGroup = "ROLE_DONOR".equals(role)
+                ? databaseBlood(required(body, "bloodGroup")) : null;
         boolean shareContact = booleanValue(body, "consentToContact", false);
-        String sql = "INSERT INTO donor_profiles(user_id,blood_group,city,consent_to_contact) VALUES(?,?,?,?)";
-
-        try (Connection connection = database.connect();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, userId);
-            statement.setString(2, bloodGroup);
-            statement.setString(3, city);
-            statement.setBoolean(4, shareContact);
-            statement.executeUpdate();
-        }
+        long userId = auth.createUser(user, password, bloodGroup, shareContact);
+        user = auth.findById(userId);
+        return authResponse(user);
     }
 
     private Object login(Map<String, Object> body) throws Exception {
@@ -160,6 +148,9 @@ public class ApiController implements HttpHandler {
             throw new ApiException(401, "Please sign in first");
         }
         long userId = auth.tokenUserId(header.substring(7));
+        if (userId < 1) {
+            throw new ApiException(401, "Please sign in first");
+        }
         User user = auth.findById(userId);
         if (user == null || !"ACTIVE".equals(user.getStatus())) {
             throw new ApiException(401, "Please sign in first");
@@ -240,7 +231,8 @@ public class ApiController implements HttpHandler {
         result.put("timestamp", java.time.Instant.now().toString());
         result.put("status", status);
         result.put("error", status == 400 ? "Bad Request" : status == 401 ? "Unauthorized"
-                : status == 403 ? "Forbidden" : status == 404 ? "Not Found" : "Internal Server Error");
+                : status == 403 ? "Forbidden" : status == 404 ? "Not Found"
+                : status == 503 ? "Service Unavailable" : "Internal Server Error");
         result.put("message", message);
         result.put("path", path);
         return gson.toJson(result);
